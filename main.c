@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include "globals.h"
 #include "piece_sprites.h"
+#include "debug.h"
 #include "tetris.h"
 
-void updateSwitches() {
+void update_switches() {
    HIDE_WIN;
    SHOW_SPRITES;
    SHOW_BKG;
@@ -26,12 +27,46 @@ void init() {
 
 UINT8 prev_up = 0;
 UINT8 prev_a = 0;
+UINT8 prev_b = 0;
+UINT8 prev_select = 0;
 UINT8 das_counter = 0;
-UINT8 current_key = 0;
+UINT8 curr_key = 0;
 UINT8 input = 0;
 UINT8 move = 0;
 void handle_input() {
    input = joypad();
+   move = 0;
+   if(curr_key) {
+      if(input & curr_key) {
+         das_counter++;
+         if(das_counter > 9) move = 1;
+      }else{
+         curr_key = 0;
+         das_counter = 0;
+      }
+   }else{
+      if(input & J_LEFT){
+         curr_key = J_LEFT;
+         move = 1;
+      }else if(input & J_RIGHT) {
+         curr_key = J_RIGHT;
+         move = 1;
+      }
+   }
+
+   if(input & J_DOWN && !check_collision(curr_piece_x, curr_piece_y - 1)) {
+      curr_piece_y--;
+   }
+
+   if(move) {
+      if(curr_key == J_LEFT && !check_collision(curr_piece_x - 1, curr_piece_y)) {
+         curr_piece_x--;
+      }
+      if(curr_key == J_RIGHT && !check_collision(curr_piece_x + 1, curr_piece_y)) {
+         curr_piece_x++;
+      }
+   }
+
    if(input & J_UP && !prev_up) {
       hard_drop();
       prev_up = 1;
@@ -41,46 +76,32 @@ void handle_input() {
    }
 
    if(input & J_A && !prev_a) {
-      rotate_clockwise();
+      rotate(CLOCKWISE);
       prev_a = 1;
    }
    if(!(input & J_A)){
       prev_a = 0;
    }
-   
-   move = 0;
-   if(current_key) {
-      if(input & current_key) {
-         das_counter++;
-         if(das_counter > 9) move = 1;
-      }else{
-         current_key = 0;
-         das_counter = 0;
-      }
-   }else{
-      if(input & J_DOWN) {
-         current_key = J_DOWN;
-         move = 1;
-      }else if(input & J_LEFT){
-         current_key = J_LEFT;
-         move = 1;
-      }else if(input & J_RIGHT) {
-         current_key = J_RIGHT;
-         move = 1;
-      }
+
+   if(input & J_B && !prev_b) {
+      rotate(COUNTERCW);
+      prev_b = 1;
+   }
+   if(!(input & J_B)){
+      prev_b = 0;
    }
 
-   if(move) {
-      if(current_key == J_DOWN && !check_collision(current_piece_position[0], current_piece_position[1] - 1)) {
-         current_piece_position[1]--;
-      }
-      if(current_key == J_LEFT && !check_collision(current_piece_position[0] - 1, current_piece_position[1])) {
-         current_piece_position[0]--;
-      }
-      if(current_key == J_RIGHT && !check_collision(current_piece_position[0] + 1, current_piece_position[1])) {
-         current_piece_position[0]++;
-      }
+   if(input & J_SELECT && !prev_select) {
+      swap_piece();
+      prev_select = 1;
    }
+   if(!(input & J_SELECT)){
+      prev_select = 0;
+   }
+}
+
+void handle_frame() {
+   
 }
 
 void main() {
@@ -88,8 +109,9 @@ void main() {
 
    while(1) {
       handle_input();
-      tetris_show_current_piece();
-      updateSwitches();
+      show_curr_piece();
+      show_ghost_piece();
+      update_switches();
       wait_vbl_done();
    }
 }
