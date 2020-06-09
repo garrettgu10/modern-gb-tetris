@@ -9,6 +9,13 @@
 UINT8 board[400];
 
 #define tetris_board(x, y) (board[10*(39 - (y)) + x])
+#define T 0
+#define O 1
+#define J 2
+#define L 3
+#define Z 4
+#define S 5
+#define I 6
 
 UINT8 pieces[56] = {
      //T piece
@@ -25,6 +32,13 @@ UINT8 pieces[56] = {
         0, 1, 1, 1, 1, 2, 2, 2,
      //I piece
         0, 2, 1, 2, 2, 2, 3, 2
+};
+
+UINT8 I_sprites[16] = {
+    9, 10, 10, 11,
+    6, 7, 7, 8,
+    11, 10, 10, 9,
+    8, 7, 7, 6
 };
 
 UINT8 NORMAL_CLOCKWISE_WALL_KICKS[40] = {
@@ -122,19 +136,24 @@ void rotate(UINT8 direction) {
 }
 
 UINT8 tetris_bag[7];
+UINT8 future_bag[7];
 UINT8 i5;
 UINT8 t3;
 UINT8 exchange_index;
 void new_bag() {
-    for(i5 = 0; i5 < 7; i5++){
-        tetris_bag[i5] = i5;
+    for(i5 = 0; i5 < 7; i5++) {
+        tetris_bag[i5] = future_bag[i5];
+    }
+
+    for(i5 = 0; i5 < 7; i5++) {
+        future_bag[i5] = i5;
     }
 
     for(i5 = 0; i5 < 7; i5++){
-        t3 = tetris_bag[i5];
+        t3 = future_bag[i5];
         exchange_index = i5 + (rand() % (7 - i5));
-        tetris_bag[i5] = tetris_bag[exchange_index];
-        tetris_bag[exchange_index] = t3;
+        future_bag[i5] = future_bag[exchange_index];
+        future_bag[exchange_index] = t3;
     }
 }
 
@@ -189,11 +208,12 @@ void tetris_init() {
     PALETTE_1 = 0x54;
     initrand(10);
     new_bag();
+    new_bag();
     set_curr_piece(get_next_piece());
 }
 
 void tetris_show_board() {
-    set_bkg_tiles(2, 0, 10, 18, board+220);
+    set_bkg_tiles(6, 0, 10, 18, board+220);
 }
 
 UINT8 has_collision;
@@ -236,7 +256,11 @@ void hard_drop() {
         curr_pos_x = new_x + curr_piece[2*i];
         curr_pos_y = new_y + curr_piece[2*i + 1];
 
-        tetris_board(curr_pos_x, curr_pos_y) = curr_piece_type + 1;
+        if(curr_piece_type == I) {
+            tetris_board(curr_pos_x, curr_pos_y) = I_sprites[4 * curr_rotation_index + i] + 1;
+        }else{
+            tetris_board(curr_pos_x, curr_pos_y) = curr_piece_type + 1;
+        }
     }
 
     set_curr_piece(get_next_piece());
@@ -248,12 +272,16 @@ void hard_drop() {
 
 void show_curr_piece() {
     for(i = 0; i < 4; i++){
-        set_sprite_tile(i, curr_piece_type);
+        if(curr_piece_type == I) {
+            set_sprite_tile(i, I_sprites[4 * curr_rotation_index + i]);
+        }else{
+            set_sprite_tile(i, curr_piece_type);
+        }
         
         curr_pos_x = curr_piece_x + curr_piece[2*i];
         curr_pos_y = curr_piece_y + curr_piece[2*i + 1];
 
-        move_sprite(i, 24U + (curr_pos_x << 3), 152U - (curr_pos_y << 3));
+        move_sprite(i, 56U + (curr_pos_x << 3), 152U - (curr_pos_y << 3));
     }
 }
 
@@ -268,10 +296,6 @@ void show_ghost_piece() {
         }
     }
 
-    if(joypad() & J_START){
-        debug_printf("%d\n", y3);
-    }
-
     for(i7 = 0; i7 < 4; i7++){
         set_sprite_tile(i7 + 4, 14);
         set_sprite_prop(i7 + 4, S_PALETTE);
@@ -279,7 +303,7 @@ void show_ghost_piece() {
         ghost_x = curr_piece_x + curr_piece[2*i7];
         ghost_y = y3 + curr_piece[2*i7 + 1];
 
-        move_sprite(i7 + 4, 24U + (ghost_x << 3), 152U - (ghost_y << 3));
+        move_sprite(i7 + 4, 56U + (ghost_x << 3), 152U - (ghost_y << 3));
     }
 
 }
