@@ -12,16 +12,17 @@ void update_switches() {
 }
 
 void init() {
-   tetris_init();
    DISPLAY_ON;
-   set_bkg_data(0, 16, tetris_pieces_tile_data);
-   set_sprite_data(0, 15, tetris_pieces_tile_data+16);
+   set_bkg_data(0, 17, tile_data);
+   set_sprite_data(0, 15, tile_data+16);
    t = 13;
    for(i = 0; i < 20; i++){
       for(j = 0; j < 18; j++){
          set_bkg_tiles(i, j, 1, 1, &t);
       }
    }
+
+   tetris_init();
    tetris_show_board();
 }
 

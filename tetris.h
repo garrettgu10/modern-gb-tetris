@@ -34,11 +34,23 @@ UINT8 pieces[56] = {
         0, 2, 1, 2, 2, 2, 3, 2
 };
 
+UINT8 light_gray_bkg[100];
+
 UINT8 I_sprites[16] = {
     9, 10, 10, 11,
     6, 7, 7, 8,
     11, 10, 10, 9,
     8, 7, 7, 6
+};
+
+UINT8 piece_previews[56] = {
+    16, 16, 1, 16, 16, 1, 1, 1,
+    16, 2, 2, 16, 16, 2, 2, 16,
+    16, 3, 16, 16, 16, 3, 3, 3,
+    16, 16, 16, 4, 16, 4, 4, 4,
+    16, 5, 5, 16, 16, 16, 5, 5,
+    16, 16, 6, 6, 16, 6, 6, 16,
+    16, 16, 16, 16, 10, 11, 11, 12,
 };
 
 UINT8 NORMAL_CLOCKWISE_WALL_KICKS[40] = {
@@ -166,6 +178,16 @@ UINT8 get_next_piece() {
     return tetris_bag[curr_index++];
 }
 
+#define next_piece(n) (n + curr_index < 7? tetris_bag[n + curr_index] : future_bag[n + curr_index - 7])
+
+UINT8 i8;
+void show_piece_previews() {
+    set_bkg_tiles(16, 0, 4, 16, light_gray_bkg);
+    for(i8 = 0; i8 < 5; i8++) { 
+        set_bkg_tiles(16, 3*i8 + 1, 4, 2, piece_previews + 8 * next_piece(i8));
+    }
+}
+
 UINT8 x2, y2, i6;
 UINT8 has_hole;
 void clear_lines() {
@@ -191,6 +213,14 @@ void clear_lines() {
 
 UINT8 held_piece = 255;
 UINT8 t4;
+
+void show_held_piece() {
+    set_bkg_tiles(2, 0, 4, 4, light_gray_bkg);
+    if(held_piece != 255) {
+        set_bkg_tiles(2, 1, 4, 2, piece_previews + 8 * held_piece);
+    }
+}
+
 void swap_piece() {
     if(held_piece == 255) {
         held_piece = curr_piece_type;
@@ -200,16 +230,24 @@ void swap_piece() {
         held_piece = curr_piece_type;
         set_curr_piece(t4);
     }
+
+    show_held_piece();
 }
 
 #define PALETTE_1 *((UINT8*)0xFF49)
 
+UINT8 i9;
 void tetris_init() {
     PALETTE_1 = 0x54;
+    for(i9 = 0; i9 < 100; i9++) {
+        light_gray_bkg[i9] = 16;
+    }
+
     initrand(10);
     new_bag();
     new_bag();
     set_curr_piece(get_next_piece());
+    show_piece_previews();
 }
 
 void tetris_show_board() {
@@ -264,6 +302,7 @@ void hard_drop() {
     }
 
     set_curr_piece(get_next_piece());
+    show_piece_previews();
 
     clear_lines();
 
