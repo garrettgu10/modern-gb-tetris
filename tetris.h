@@ -67,6 +67,20 @@ UINT8 NORMAL_COUNTERCLOCKWISE_WALL_KICKS[40] = {
     0, 0, -1, 0, -1, -1, 0, 2, -1, 2
 };
 
+UINT8 I_CLOCKWISE_WALL_KICKS[40] = {
+    0, 0, -2, 0, 1, 0, -2, -1, 1, 2,
+    0, 0, -1, 0, 2, 0, -1, 2, 2, -1,
+    0, 0, 2, 0, -1, 0, 2, 1, -1, -2,
+    0, 0, 1, 0, -2, 0, 1, -2, -2, 1
+};
+
+UINT8 I_COUNTERCLOCKWISE_WALL_KICKS[40] = {
+    0, 0, -1, 0, 2, 0, -1, 2, 2, -1,
+    0, 0, 2, 0, -1, 0, 2, 1, -1, -2,
+    0, 0, 1, 0, -2, 0, 1, -2, -2, 1,
+    0, 0, -2, 0, 1, 0, -2, -1, 1, 2
+};
+
 UINT8 bounding_box_size[7] = {3, 2, 3, 3, 3, 3, 4}; //width and height
 
 UINT8 curr_piece_x, curr_piece_y;
@@ -122,12 +136,23 @@ void rotate(UINT8 direction) {
     for(i3 = 0; i3 < 5; i3++){
         wall_kick_index = i3 * 2 + curr_rotation_index * 10;
 
-        if(direction == CLOCKWISE){
-            kicked_x = curr_piece_x + NORMAL_CLOCKWISE_WALL_KICKS[wall_kick_index];
-            kicked_y = curr_piece_y + NORMAL_CLOCKWISE_WALL_KICKS[wall_kick_index + 1];
+        //need repetition b/c dynamic arrays are gimmicky in gbdk
+        if(curr_piece_type == I) {
+            if(direction == CLOCKWISE){
+                kicked_x = curr_piece_x + I_CLOCKWISE_WALL_KICKS[wall_kick_index];
+                kicked_y = curr_piece_y + I_CLOCKWISE_WALL_KICKS[wall_kick_index + 1];
+            }else{
+                kicked_x = curr_piece_x + I_COUNTERCLOCKWISE_WALL_KICKS[wall_kick_index];
+                kicked_y = curr_piece_y + I_COUNTERCLOCKWISE_WALL_KICKS[wall_kick_index + 1];
+            }
         }else{
-            kicked_x = curr_piece_x + NORMAL_COUNTERCLOCKWISE_WALL_KICKS[wall_kick_index];
-            kicked_y = curr_piece_y + NORMAL_COUNTERCLOCKWISE_WALL_KICKS[wall_kick_index + 1];
+            if(direction == CLOCKWISE){
+                kicked_x = curr_piece_x + NORMAL_CLOCKWISE_WALL_KICKS[wall_kick_index];
+                kicked_y = curr_piece_y + NORMAL_CLOCKWISE_WALL_KICKS[wall_kick_index + 1];
+            }else{
+                kicked_x = curr_piece_x + NORMAL_COUNTERCLOCKWISE_WALL_KICKS[wall_kick_index];
+                kicked_y = curr_piece_y + NORMAL_COUNTERCLOCKWISE_WALL_KICKS[wall_kick_index + 1];
+            }
         }
 
         if(!check_collision(kicked_x, kicked_y)) {
