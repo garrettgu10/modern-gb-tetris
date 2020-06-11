@@ -105,16 +105,22 @@ void handle_input() {
    }
 }
 
-void handle_frame() {
-   
-}
-
 void main() {
+   printf("MODERN TETRIS\n\n");
+   printf("PRESS START TO BEGIN\n");
+   
+   while(!(joypad() & J_START)){
+      rand_counter++;
+   }
+   initrand(rand_counter);
+   printf("%d\n", rand_counter);
+
    init();
 
    while(1) {
       rand_counter++;
       handle_input();
+      handle_gravity();
       show_curr_piece();
       show_ghost_piece();
       update_switches();

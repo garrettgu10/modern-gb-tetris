@@ -81,6 +81,10 @@ UINT8 I_COUNTERCLOCKWISE_WALL_KICKS[40] = {
     0, 0, -2, 0, 1, 0, -2, -1, 1, 2
 };
 
+UINT8 GRAVITY_FRAMES[15] = {60, 47, 37, 28, 21, 16, 11, 8, 6, 4, 3, 2, 1, 1, 1};
+UINT8 GRAVITY_LINES[15] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3};
+UINT8 gravity_counter = 0;
+
 UINT8 bounding_box_size[7] = {3, 2, 3, 3, 3, 3, 4}; //width and height
 
 UINT8 curr_piece_x, curr_piece_y;
@@ -88,6 +92,7 @@ UINT8 curr_piece_type;
 
 UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
+UINT8 curr_level = 10;
 
 UINT8 check_collision(UINT8 x, UINT8 y);
 
@@ -104,6 +109,8 @@ void set_curr_piece(UINT8 type) {
     curr_rotation_index = 0;
     curr_piece_x = 5 - (bounding_box_size[curr_piece_type] + 1) / 2;
     curr_piece_y = (curr_piece_type == 1? 16: 15);
+
+    gravity_counter = 0;
 }
 
 #define CLOCKWISE 0
@@ -268,7 +275,6 @@ void tetris_init() {
         light_gray_bkg[i9] = 16;
     }
 
-    initrand(10);
     new_bag();
     new_bag();
     set_curr_piece(get_next_piece());
@@ -369,7 +375,25 @@ void show_ghost_piece() {
 
         move_sprite(i7 + 4, 56U + (ghost_x << 3), 152U - (ghost_y << 3));
     }
+}
 
+#define frames_to_wait (curr_level > 15? 1 : GRAVITY_FRAMES[curr_level-1])
+UINT8 lines_to_drop = 0;
+UINT8 i10 = 0;
+void handle_gravity() { //called every frame
+    gravity_counter++;
+    if(gravity_counter >= frames_to_wait) {
+        gravity_counter = 0;
+        
+        lines_to_drop = (curr_level > 15? 18 : GRAVITY_LINES[curr_level-1]);
+        for(i10 = 0; i10 < lines_to_drop; i10++) {
+            if(!check_collision(curr_piece_x, curr_piece_y - 1)) {
+                curr_piece_y --;
+            }else{
+                break;
+            }
+        }
+    }
 }
 
 #endif
