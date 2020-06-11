@@ -26,6 +26,8 @@ void init() {
    tetris_show_board();
 }
 
+UINT8 rand_counter = 0;
+
 UINT8 prev_up = 0;
 UINT8 prev_a = 0;
 UINT8 prev_b = 0;
@@ -36,6 +38,7 @@ UINT8 input = 0;
 UINT8 move = 0;
 void handle_input() {
    input = joypad();
+   //handle DAS
    move = 0;
    if(curr_key) {
       if(input & curr_key) {
@@ -46,6 +49,7 @@ void handle_input() {
          das_counter = 0;
       }
    }else{
+      initrand(rand_counter ^ rand()); //seed RNG with user input timing
       if(input & J_LEFT){
          curr_key = J_LEFT;
          move = 1;
@@ -109,6 +113,7 @@ void main() {
    init();
 
    while(1) {
+      rand_counter++;
       handle_input();
       show_curr_piece();
       show_ghost_piece();
