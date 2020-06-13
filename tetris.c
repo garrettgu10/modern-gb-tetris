@@ -37,28 +37,28 @@ UINT8 piece_previews[56] = {
     16, 16, 16, 16, 10, 11, 11, 12,
 };
 
-UINT8 NORMAL_CLOCKWISE_WALL_KICKS[40] = {
+INT8 NORMAL_CLOCKWISE_WALL_KICKS[40] = {
     0, 0, -1, 0, -1, 1, 0, -2, -1, -2,
     0, 0, 1, 0, 1, -1, 0, 2, 1, 2,
     0, 0, 1, 0, 1, 1, 0, -2, 1, -2,
     0, 0, -1, 0, -1, -1, 0, 2, -1, -2
 };
 
-UINT8 NORMAL_COUNTERCLOCKWISE_WALL_KICKS[40] = {
+INT8 NORMAL_COUNTERCLOCKWISE_WALL_KICKS[40] = {
     0, 0, 1, 0, 1, 1, 0, -2, 1, -2,
     0, 0, 1, 0, 1, -1, 0, 2, 1, 2,
     0, 0, -1, 0, -1, 1, 0, -2, -1, -2,
     0, 0, -1, 0, -1, -1, 0, 2, -1, 2
 };
 
-UINT8 I_CLOCKWISE_WALL_KICKS[40] = {
+INT8 I_CLOCKWISE_WALL_KICKS[40] = {
     0, 0, -2, 0, 1, 0, -2, -1, 1, 2,
     0, 0, -1, 0, 2, 0, -1, 2, 2, -1,
     0, 0, 2, 0, -1, 0, 2, 1, -1, -2,
     0, 0, 1, 0, -2, 0, 1, -2, -2, 1
 };
 
-UINT8 I_COUNTERCLOCKWISE_WALL_KICKS[40] = {
+INT8 I_COUNTERCLOCKWISE_WALL_KICKS[40] = {
     0, 0, -1, 0, 2, 0, -1, 2, 2, -1,
     0, 0, 2, 0, -1, 0, 2, 1, -1, -2,
     0, 0, 1, 0, -2, 0, 1, -2, -2, 1,
@@ -199,25 +199,44 @@ void show_piece_previews() {
     }
 }
 
-UINT8 x2, y2, i6;
+UINT8 x2, y2, i6, t5;
 UINT8 has_hole;
+UINT8 curr_line_to_copy;
+UINT8 lines_to_copy[40];
+UINT8 *row;
+UINT8 *row1;
 void clear_lines() {
-    for(y2 = 0; y2 != 20; y2++) {
+    curr_line_to_copy = 0;
+    for(y2 = 0; y2 != 40; y2++) {
         has_hole = 0;
+        row = tetris_row(y2);
         for(x2 = 0; x2 != 10; x2++){
-            if(tetris_board(x2, y2) == 0) {
+            if(row[x2] == 0) {
                 has_hole = 1;
             }
         }
 
-        if(!has_hole) {
-            //move every line above this down
-            for(i6 = y2; i6 != 19; i6++) {
-                for(x2 = 0; x2 != 10; x2++){
-                    tetris_board(x2, i6) = tetris_board(x2, i6+1);
-                }
-            }
-            y2--;
+        if(has_hole) {
+            lines_to_copy[curr_line_to_copy] = y2;
+            curr_line_to_copy++;
+        }
+    }
+
+    if(curr_line_to_copy == 40) return;
+
+    for(y2 = curr_line_to_copy; y2 != 40; y2++) {
+        row = tetris_row(y2);
+        for(x2 = 0; x2 != 0; x2++) {
+            row[x2] = 0;
+        }
+    }
+
+    for(y2 = 0; y2 != curr_line_to_copy; y2++){
+        t5 = lines_to_copy[y2];
+        row = tetris_row(y2);
+        row1 = tetris_row(t5);
+        for(x2 = 0; x2 != 10; x2++) {
+            row[x2] = row1[x2];
         }
     }
 }

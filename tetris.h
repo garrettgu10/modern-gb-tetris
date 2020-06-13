@@ -2,12 +2,13 @@
 #define TETRIS_H
 #include <gb/gb.h>
 #include <rand.h>
-#include <debug.h>
+#include "debug.h"
 #include "stdio.h"
 
 extern UINT8 board[400];
 
 #define tetris_board(x, y) (board[10*(39 - (y)) + x])
+#define tetris_row(y) (board + 10 * (39 - (y)))
 #define T 0
 #define O 1
 #define J 2
