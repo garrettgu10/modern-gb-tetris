@@ -1,9 +1,15 @@
 #include <gb/gb.h>
 #include <stdio.h>
-#include "globals.h"
-#include "piece_sprites.h"
+#include "tile_data.h"
 #include "debug.h"
 #include "tetris.h"
+
+UINT8 i = 0;
+UINT8 j = 0;
+UINT8 t = 0;
+UINT8 t0 = 0;
+UINT8 t1 = 0;
+UINT8 t2 = 0;
 
 void update_switches() {
    HIDE_WIN;

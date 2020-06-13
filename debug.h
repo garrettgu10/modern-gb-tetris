@@ -2,8 +2,8 @@
 #define DEBUG_H
 #include <gb/gb.h>
 
-UINT8 debug_buff[256];
-UINT8 *c;
+static UINT8 debug_buff[256];
+static UINT8 *c;
 
 #define debug_printf(...) {\
     sprintf(debug_buff, __VA_ARGS__); \
