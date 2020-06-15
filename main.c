@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "tile_data.h"
 #include "debug.h"
+#include "scoring.h"
 #include "tetris.h"
 
 UINT8 i = 0;
@@ -20,6 +21,7 @@ void update_switches() {
 void init() {
    DISPLAY_ON;
    set_bkg_data(0, 17, tile_data);
+   set_bkg_data(17, 40, font_data);
    set_sprite_data(0, 15, tile_data+16);
    t = 13;
    for(i = 0; i < 20; i++){
@@ -29,6 +31,7 @@ void init() {
    }
 
    tetris_init();
+   draw_score();
    tetris_show_board();
 }
 

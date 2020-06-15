@@ -1,4 +1,5 @@
 #include "tetris.h"
+#include "scoring.h"
 
 UINT8 board[400];
 
@@ -76,7 +77,7 @@ UINT8 curr_piece_type;
 
 UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
-UINT8 curr_level = 10;
+UINT8 curr_level = 1;
 
 UINT8 i2;
 void copy_piece(UINT8 *src, UINT8 *dest) {
@@ -174,7 +175,7 @@ void new_bag() {
 
     for(i5 = 0; i5 < 7; i5++){
         t3 = future_bag[i5];
-        exchange_index = i5 + (rand() % (7 - i5));
+        exchange_index = i5 + ((UINT8)rand() % (7 - i5));
         future_bag[i5] = future_bag[exchange_index];
         future_bag[exchange_index] = t3;
     }
@@ -205,8 +206,10 @@ UINT8 curr_line_to_copy;
 UINT8 lines_to_copy[40];
 UINT8 *row;
 UINT8 *row1;
+UINT8 lines_cleared;
 void clear_lines() {
     curr_line_to_copy = 0;
+    lines_cleared = 0;
     for(y2 = 0; y2 != 40; y2++) {
         has_hole = 0;
         row = tetris_row(y2);
@@ -219,7 +222,13 @@ void clear_lines() {
         if(has_hole) {
             lines_to_copy[curr_line_to_copy] = y2;
             curr_line_to_copy++;
+        }else{
+            lines_cleared++;
         }
+    }
+    
+    if(lines_cleared != 0) {
+        count_lines(lines_cleared);
     }
 
     if(curr_line_to_copy == 40) return;
