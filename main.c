@@ -31,7 +31,7 @@ void init() {
    }
 
    tetris_init();
-   draw_score();
+   draw_scores();
    tetris_show_board();
 }
 

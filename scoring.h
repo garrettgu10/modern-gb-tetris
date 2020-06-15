@@ -2,7 +2,7 @@
 #define SCORING_H
 #include "bcd.h"
 
-void draw_score();
+void draw_scores();
 void count_lines(UINT8 lines);
 
 #endif
