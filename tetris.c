@@ -70,14 +70,17 @@ UINT8 GRAVITY_FRAMES[15] = {60, 47, 37, 28, 21, 16, 11, 8, 6, 4, 3, 2, 1, 1, 1};
 UINT8 GRAVITY_LINES[15] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3};
 UINT8 gravity_counter = 0;
 
+UINT8 LOCK_DELAYS[] = {28, 26, 24, 20, 17};
+#define LOCK_DELAY_MAX (curr_level <= 15? 30 : (curr_level < 20? LOCK_DELAYS[curr_level - 15] : 15))
+
 UINT8 bounding_box_size[7] = {3, 2, 3, 3, 3, 3, 4}; //width and height
 
-UINT8 curr_piece_x, curr_piece_y;
+INT8 curr_piece_x, curr_piece_y;
 UINT8 curr_piece_type;
 
 UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
-UINT8 curr_level = 1;
+UINT8 curr_level = 0;
 
 UINT8 i2;
 void copy_piece(UINT8 *src, UINT8 *dest) {
@@ -92,6 +95,11 @@ void set_curr_piece(UINT8 type) {
     curr_rotation_index = 0;
     curr_piece_x = 5 - (bounding_box_size[curr_piece_type] + 1) / 2;
     curr_piece_y = (curr_piece_type == 1? 16: 15);
+
+    lock_delay_counter = LOCK_DELAY_MAX;
+    lock_delay_active = 0;
+    lock_delay_extensions = lock_delay_extensions_max;
+    lock_delay_extensions_min_y = curr_piece_y;
 
     gravity_counter = 0;
 }
@@ -142,7 +150,12 @@ void rotate(UINT8 direction) {
             }
         }
 
-        if(!check_collision(kicked_x, kicked_y)) {
+        if(!check_collision(kicked_x, kicked_y)) { //successful rotation
+            if(lock_delay_active && lock_delay_extensions != 0) {
+                lock_delay_counter = LOCK_DELAY_MAX;
+                lock_delay_extensions--;
+            }
+
             curr_piece_x = kicked_x;
             curr_piece_y = kicked_y;
 
@@ -260,7 +273,11 @@ void show_held_piece() {
     }
 }
 
+UINT8 can_swap = 1;
 void swap_piece() {
+    if(!can_swap) {
+        return;
+    }
     if(held_piece == 255) {
         held_piece = curr_piece_type;
         set_curr_piece(get_next_piece());
@@ -269,6 +286,8 @@ void swap_piece() {
         held_piece = curr_piece_type;
         set_curr_piece(t4);
     }
+
+    can_swap = 0;
 
     show_held_piece();
 }
@@ -340,6 +359,8 @@ void hard_drop() {
         }
     }
 
+    can_swap = 1;
+
     set_curr_piece(get_next_piece());
     show_piece_previews();
 
@@ -385,6 +406,45 @@ void show_ghost_piece() {
     }
 }
 
+void move_piece(INT8 direction) {
+    if(direction == DOWN){
+        if(!check_collision(curr_piece_x, curr_piece_y - 1)){
+            curr_piece_y--;
+            if(curr_piece_y < lock_delay_extensions_min_y) {
+                lock_delay_extensions = lock_delay_extensions_max;
+                lock_delay_extensions_min_y = curr_piece_y;
+            }
+        }else{
+            lock_delay_active = 1;
+        }
+    }else{
+        if(!check_collision(curr_piece_x + direction, curr_piece_y)) {
+            curr_piece_x += direction;
+            if(lock_delay_active && lock_delay_extensions != 0) {
+                lock_delay_counter = LOCK_DELAY_MAX;
+                lock_delay_extensions--;
+            }
+        }
+    }
+}
+
+UINT8 lock_delay_active = 0;
+UINT8 lock_delay_counter = 30;
+UINT8 lock_delay_extensions_max = 15;
+UINT8 lock_delay_extensions = 15;
+INT8 lock_delay_extensions_min_y = 20;
+void handle_lock_delay() {
+    if(lock_delay_active) {
+        lock_delay_counter--;
+        if(lock_delay_counter == 0) {
+            hard_drop();
+
+            lock_delay_active = 0;
+            lock_delay_counter = LOCK_DELAY_MAX;
+        }
+    }
+}
+
 #define frames_to_wait (curr_level > 15? 1 : GRAVITY_FRAMES[curr_level-1])
 UINT8 lines_to_drop = 0;
 UINT8 i10 = 0;
@@ -395,11 +455,7 @@ void handle_gravity() { //called every frame
         
         lines_to_drop = (curr_level > 15? 18 : GRAVITY_LINES[curr_level-1]);
         for(i10 = 0; i10 < lines_to_drop; i10++) {
-            if(!check_collision(curr_piece_x, curr_piece_y - 1)) {
-                curr_piece_y --;
-            }else{
-                break;
-            }
+            move_piece(DOWN);
         }
     }
 }

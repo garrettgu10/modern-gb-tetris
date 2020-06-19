@@ -21,8 +21,7 @@ void draw_scores() {
     line_count_len = bcd_len(&line_count);
     set_bkg_tiles(6 - line_count_len, 7, line_count_len, 1, buf + 8 - line_count_len);
 
-    level_bcd = BCD_HEX(curr_level);
-    bcd_add(&level_bcd, &ZERO);
+    level_bcd = BCD_HEX(curr_level / 10 * 16 + curr_level % 10);
     bcd2text(&level_bcd, 47, buf);
     level_len = bcd_len(&level_bcd);
     set_bkg_tiles(6 - level_len, 9, level_len, 1, buf + 8 - level_len);

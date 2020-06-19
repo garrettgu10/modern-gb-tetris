@@ -68,16 +68,16 @@ void handle_input() {
       }
    }
 
-   if(input & J_DOWN && !check_collision(curr_piece_x, curr_piece_y - 1)) {
-      curr_piece_y--;
+   if(input & J_DOWN) {
+      move_piece(DOWN);
    }
 
    if(move) {
-      if(curr_key == J_LEFT && !check_collision(curr_piece_x - 1, curr_piece_y)) {
-         curr_piece_x--;
+      if(curr_key == J_LEFT) {
+         move_piece(LEFT);
       }
-      if(curr_key == J_RIGHT && !check_collision(curr_piece_x + 1, curr_piece_y)) {
-         curr_piece_x++;
+      if(curr_key == J_RIGHT) {
+         move_piece(RIGHT);
       }
    }
 
@@ -130,6 +130,7 @@ void main() {
       rand_counter++;
       handle_input();
       handle_gravity();
+      handle_lock_delay();
       show_curr_piece();
       show_ghost_piece();
       update_switches();
