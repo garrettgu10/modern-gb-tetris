@@ -1,5 +1,6 @@
 #include "tetris.h"
 #include "scoring.h"
+#include "text.h"
 
 UINT8 board[400];
 
@@ -80,7 +81,7 @@ UINT8 curr_piece_type;
 
 UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
-UINT8 curr_level = 1;
+UINT8 curr_level = 10;
 
 UINT8 i2;
 void copy_piece(UINT8 *src, UINT8 *dest) {
@@ -89,12 +90,21 @@ void copy_piece(UINT8 *src, UINT8 *dest) {
     }
 }
 
+void game_over() {
+    write_text(" GAME OVER", 6, 8);
+    while(1);
+}
+
 void set_curr_piece(UINT8 type) {
     copy_piece(pieces + 8*type, curr_piece);
     curr_piece_type = type;
     curr_rotation_index = 0;
     curr_piece_x = 5 - (bounding_box_size[curr_piece_type] + 1) / 2;
     curr_piece_y = (curr_piece_type == 1? 16: 15);
+
+    if(check_collision(curr_piece_x, curr_piece_y)) {
+        game_over();
+    }
 
     lock_delay_counter = LOCK_DELAY_MAX;
     lock_delay_active = 0;
@@ -281,6 +291,7 @@ void swap_piece() {
     if(held_piece == 255) {
         held_piece = curr_piece_type;
         set_curr_piece(get_next_piece());
+        show_piece_previews();
     }else{
         t4 = held_piece;
         held_piece = curr_piece_type;
