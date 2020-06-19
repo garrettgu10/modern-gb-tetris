@@ -155,13 +155,10 @@ UINT8 bcd_len(BCD * bcd) {
     i = 8;
     for(b = (UINT8 *)bcd + 3; b != bcd - 1; b--){
         t = *b;
-        debug_printf("%d\n", t);
-        debug_printf(" %d\n", (t & 0xf0));
         if((t & 0xf0) != 0) {
             return i;
         }
         i--;
-        debug_printf(" %d\n", (t & 0xf));
         if((t & 0xf) != 0) {
             return i;
         }
