@@ -80,7 +80,7 @@ UINT8 curr_piece_type;
 
 UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
-UINT8 curr_level = 0;
+UINT8 curr_level = 1;
 
 UINT8 i2;
 void copy_piece(UINT8 *src, UINT8 *dest) {
