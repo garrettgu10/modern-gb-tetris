@@ -38,7 +38,7 @@ void init() {
    draw_scores();
    tetris_show_board();
 
-   gbt_play(tetris99_Data, 2, 6);
+   gbt_play(tetris99_Data, 2, 7);
    gbt_loop(1);
    disable_interrupts();
    add_VBL(gbt_update);
