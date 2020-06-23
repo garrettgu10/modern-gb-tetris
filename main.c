@@ -126,7 +126,7 @@ void handle_input() {
 }
 
 void main() {
-   printf("MODERN TETRIS\n\n");
+   printf(" \n MODERN TETRIS\n BY GG\n\n");
    printf("PRESS START TO BEGIN\n");
    
    while(!(joypad() & J_START)){
