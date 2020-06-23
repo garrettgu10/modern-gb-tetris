@@ -63,7 +63,7 @@ void show_ghost_piece();
 #define LEFT -1
 #define RIGHT 1
 #define DOWN 0
-void move_piece(INT8 direction);
+UINT8 move_piece(INT8 direction);
 
 void handle_lock_delay();
 void handle_gravity();

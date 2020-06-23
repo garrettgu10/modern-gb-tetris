@@ -38,7 +38,7 @@ void count_lines(UINT8 lines) {
     bcd_add(&line_count, &temp);
     bcd_add(&level_line_count, &temp);
 
-    if(curr_level != 20 && bcd_compare(&level_line_count, &lines_per_level) >= 0) {
+    if(curr_level != 25 && bcd_compare(&level_line_count, &lines_per_level) >= 0) {
         bcd_sub(&level_line_count, &lines_per_level);
         curr_level++;
     }

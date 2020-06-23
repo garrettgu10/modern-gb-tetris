@@ -5,6 +5,10 @@
 #include "scoring.h"
 #include "tetris.h"
 
+#include "gbt_player.h"
+
+extern const UINT8 *tetris99_Data[];
+
 UINT8 i = 0;
 UINT8 j = 0;
 UINT8 t = 0;
@@ -33,6 +37,13 @@ void init() {
    tetris_init();
    draw_scores();
    tetris_show_board();
+
+   gbt_play(tetris99_Data, 2, 6);
+   gbt_loop(1);
+   disable_interrupts();
+   add_VBL(gbt_update);
+   enable_interrupts();
+   set_interrupts(VBL_IFLAG);
 }
 
 UINT8 rand_counter = 0;

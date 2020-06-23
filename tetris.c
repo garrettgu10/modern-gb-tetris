@@ -71,8 +71,8 @@ UINT8 GRAVITY_FRAMES[15] = {60, 47, 37, 28, 21, 16, 11, 8, 6, 4, 3, 2, 1, 1, 1};
 UINT8 GRAVITY_LINES[15] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3};
 UINT8 gravity_counter = 0;
 
-UINT8 LOCK_DELAYS[] = {28, 26, 24, 20, 17};
-#define LOCK_DELAY_MAX (curr_level <= 15? 30 : (curr_level < 20? LOCK_DELAYS[curr_level - 15] : 15))
+UINT8 LOCK_DELAYS[] = {27, 25, 23, 21, 20, 19, 18, 17, 16, 15};
+#define LOCK_DELAY_MAX (curr_level <= 15? 30 : (curr_level < 25? LOCK_DELAYS[curr_level - 15] : 15))
 
 UINT8 bounding_box_size[7] = {3, 2, 3, 3, 3, 3, 4}; //width and height
 
@@ -81,7 +81,7 @@ UINT8 curr_piece_type;
 
 UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
-UINT8 curr_level = 10;
+UINT8 curr_level = 1;
 
 UINT8 i2;
 void copy_piece(UINT8 *src, UINT8 *dest) {
@@ -417,7 +417,7 @@ void show_ghost_piece() {
     }
 }
 
-void move_piece(INT8 direction) {
+UINT8 move_piece(INT8 direction) {
     if(direction == DOWN){
         if(!check_collision(curr_piece_x, curr_piece_y - 1)){
             curr_piece_y--;
@@ -425,8 +425,10 @@ void move_piece(INT8 direction) {
                 lock_delay_extensions = lock_delay_extensions_max;
                 lock_delay_extensions_min_y = curr_piece_y;
             }
+            return 1;
         }else{
             lock_delay_active = 1;
+            return 0;
         }
     }else{
         if(!check_collision(curr_piece_x + direction, curr_piece_y)) {
@@ -435,6 +437,9 @@ void move_piece(INT8 direction) {
                 lock_delay_counter = LOCK_DELAY_MAX;
                 lock_delay_extensions--;
             }
+            return 1;
+        }else{
+            return 0;
         }
     }
 }
@@ -466,7 +471,7 @@ void handle_gravity() { //called every frame
         
         lines_to_drop = (curr_level > 15? 18 : GRAVITY_LINES[curr_level-1]);
         for(i10 = 0; i10 < lines_to_drop; i10++) {
-            move_piece(DOWN);
+            if(!move_piece(DOWN)) break;
         }
     }
 }
