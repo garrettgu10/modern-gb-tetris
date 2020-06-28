@@ -230,16 +230,27 @@ UINT8 lines_to_copy[40];
 UINT8 *row;
 UINT8 *row1;
 UINT8 lines_cleared;
+UINT8 line_exists;
+UINT8 lines_existing; // number of lines with at least one tetromino
 void clear_lines() {
     curr_line_to_copy = 0;
     lines_cleared = 0;
+    lines_existing = 0;
+
     for(y2 = 0; y2 != 40; y2++) {
+        line_exists = 0;
         has_hole = 0;
         row = tetris_row(y2);
         for(x2 = 0; x2 != 10; x2++){
             if(row[x2] == 0) {
                 has_hole = 1;
+            }else{
+                line_exists = 1;
             }
+        }
+
+        if(line_exists) {
+            lines_existing += 1;
         }
 
         if(has_hole) {
@@ -249,9 +260,11 @@ void clear_lines() {
             lines_cleared++;
         }
     }
+
+    #define HAS_PCLEAR (lines_existing == lines_cleared)
     
     if(lines_cleared != 0) {
-        count_lines(lines_cleared);
+        count_lines(lines_cleared, 0, HAS_PCLEAR);
     }
 
     if(curr_line_to_copy == 40) return;

@@ -34,16 +34,22 @@ void init() {
       }
    }
 
+   for(UINT8 i = 0; i < 4; i++){
+      show_toast("      ", i);
+   }
+
    tetris_init();
    draw_scores();
    tetris_show_board();
 
+   #ifdef MUS_ENABLE
    gbt_play(tetris99_Data, 2, 7);
    gbt_loop(1);
    disable_interrupts();
    add_VBL(gbt_update);
    enable_interrupts();
    set_interrupts(VBL_IFLAG);
+   #endif
 }
 
 UINT8 rand_counter = 0;
@@ -142,6 +148,7 @@ void main() {
       handle_input();
       handle_gravity();
       handle_lock_delay();
+      handle_toast_frame();
       show_curr_piece();
       show_ghost_piece();
       update_switches();

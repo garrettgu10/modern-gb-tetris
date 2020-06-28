@@ -33,7 +33,7 @@ void draw_scores() {
 
 BCD temp;
 BCD lines_per_level = MAKE_BCD(10);
-void count_lines(UINT8 lines) {
+void count_lines(UINT8 lines, UINT8 is_tspin, UINT8 is_pclear) {
     temp = BCD_HEX(lines);
     bcd_add(&line_count, &temp);
     bcd_add(&level_line_count, &temp);
@@ -43,5 +43,47 @@ void count_lines(UINT8 lines) {
         curr_level++;
     }
 
+    if(lines == 1) {
+        show_toast("SINGLE", 1);
+    }else if(lines == 2) {
+        show_toast("DOUBLE", 1);
+    }else if(lines == 3){
+        show_toast("TRIPLE", 1);
+    }else if(lines == 4){
+        show_toast("TETRIS", 1);
+    }
+
+    if(is_pclear) {
+        show_toast("PCLEAR", 3);
+    }
+
+    if(is_tspin) {
+        show_toast("T SPIN", 0);
+    }
+
     draw_scores();
+}
+
+#define FRAMES_PER_TOAST 255
+
+UINT8 toast_frames_remaining[4] = {0}; // for each toast
+//y: 14, 15, 16, 17
+void show_toast(char* msg, UINT8 toast_slot) { //toast_slot: [0, 3]
+    write_text(msg, 0, 14 + toast_slot);
+    toast_frames_remaining[toast_slot] = FRAMES_PER_TOAST;
+}
+
+UINT8 toast_i;
+void handle_toast_frame() {
+    for(toast_i = 0; toast_i < 4; toast_i++){
+        if(toast_frames_remaining[toast_i] == 0) {
+            continue;
+        }
+
+        toast_frames_remaining[toast_i]--;
+
+        if(toast_frames_remaining[toast_i] == 0) {
+            write_text("      ", 0, 14 + toast_i);
+        }
+    }
 }
