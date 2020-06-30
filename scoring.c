@@ -8,6 +8,12 @@ BCD score = MAKE_BCD(0);
 BCD line_count = MAKE_BCD(0);
 BCD level_line_count = MAKE_BCD(0); // count up to 20
 
+void reset_scoring() {
+    score = MAKE_BCD(0);
+    line_count = MAKE_BCD(0);
+    level_line_count = MAKE_BCD(0);
+}
+
 unsigned char buf[10];
 UINT8 score_len;
 UINT8 line_count_len;
@@ -32,14 +38,14 @@ void draw_scores() {
 }
 
 BCD temp;
-BCD lines_per_level = MAKE_BCD(10);
+BCD LINES_PER_LEVEL = MAKE_BCD(10);
 void count_lines(UINT8 lines, UINT8 is_tspin, UINT8 is_pclear) {
     temp = BCD_HEX(lines);
     bcd_add(&line_count, &temp);
     bcd_add(&level_line_count, &temp);
 
-    if(curr_level != 25 && bcd_compare(&level_line_count, &lines_per_level) >= 0) {
-        bcd_sub(&level_line_count, &lines_per_level);
+    if(curr_level != 25 && bcd_compare(&level_line_count, &LINES_PER_LEVEL) >= 0) {
+        bcd_sub(&level_line_count, &LINES_PER_LEVEL);
         curr_level++;
     }
 

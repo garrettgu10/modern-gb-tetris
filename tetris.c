@@ -83,6 +83,15 @@ UINT8 curr_piece[8];
 UINT8 curr_rotation_index = 0;
 UINT8 curr_level = 1;
 
+void reset_game() {
+    curr_level = 1;
+    gravity_counter = 0;
+
+    //TODO: reset game board, score counter
+
+    tetris_init();
+}
+
 UINT8 i2;
 void copy_piece(UINT8 *src, UINT8 *dest) {
     for(i2 = 0; i2 < 8; i2++){
