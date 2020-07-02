@@ -446,6 +446,7 @@ UINT8 move_piece(INT8 direction) {
             if(curr_piece_y < lock_delay_extensions_min_y) {
                 lock_delay_extensions = lock_delay_extensions_max;
                 lock_delay_extensions_min_y = curr_piece_y;
+                lock_delay_counter = LOCK_DELAY_MAX;
             }
             return 1;
         }else{
